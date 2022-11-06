@@ -315,21 +315,30 @@ public class Server {
 
                     boolean flagOverwrite = true;
 
+                    if(requestData.size()==11 && requestData.get(10).contains("false"))
+                        flagOverwrite=false;
+
                     if (!files.contains(requestedFile))
                         statusCode = 202;
-                    else
+                    else if(flagOverwrite)
                         statusCode = 201;
+                    else
+                        statusCode = 301;
 
 
+                    if(flagOverwrite) {
                     int index = requestData.indexOf("-d");
 
                     for(int i = index + 1 ; i < requestData.size() ; i++)
                     {
+                        if(requestData.get(i).contains("overwrite"))
+                            break;
                         data = data + requestData.get(i) + " ";
                     }
 
-                    File file = new File(directory + "/" + requestedFile);
-                    Server.writeResponseToFile(file, data);
+                        File file = new File(directory + "/" + requestedFile);
+                        Server.writeResponseToFile(file, data);
+                    }
 
                 }
 
@@ -344,6 +353,10 @@ public class Server {
                 else if(statusCode == 202)
                 {
                     body = body + "\t\"status\": \"" + "HTTP/1.1 202 NEW FILE CREATED" + "\",\n";
+                }
+                else if(statusCode == 301)
+                {
+                    body = body + "\t\"status\": \"" + "HTTP/1.1 301 NOT MODIFIED" + "\",\n";
                 }
                 else if(statusCode == 404)
                 {

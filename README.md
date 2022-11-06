@@ -9,5 +9,29 @@ does not exist, it should return an appropriate status code (e.g. HTTP ERROR 404
 * 3- POST /bar should create or overwrite the file named bar in the data directory with
 the content of the body of the request. 
 
+To test the file transfer command:-
+
+httpfs GET / http://localhost:8080/get/
+
+httpfs GET /GetTest.txt http://localhost:8080/get/
+
+httpfs POST /PostTest.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"}
+
+httpfs POST /PostTest.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"} overwrite=false
+
+
+To test the httpc commands:-
+
+httpc get -h Content-Type:application/json -h Testing-Header:TestHeader 'http://localhost:8080/get?course=networking&assignment=1'
+
+httpc post -h Content-Type:application/json -d '{"Assignment": 2, "Course": 6461}' 'http://localhost:8080/post?'
+
+httpc get -v -h Content-Type:application/json 'http://localhost:8080/get?course=networking&assignment=1'
+
+httpc post -v -h Content-Type:application/json -d '{"Assignment": 2, "Course": 6461}' 'http://localhost:8080/post?'
+
+
+
+
 
 
