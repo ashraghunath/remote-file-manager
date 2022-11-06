@@ -30,7 +30,7 @@ httpfs GET /img.png http://localhost:8080/get/
 
 httpfs GET /artemis.html http://localhost:8080/get/
 
-httpfs GET /getTest.txt http://localhost:8080/get/
+httpfs GET /img.png http://localhost:8080/get/
 
 httpfs POST /PostTest.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"}
 
