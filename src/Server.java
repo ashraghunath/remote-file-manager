@@ -350,16 +350,19 @@ public class Server {
                     else {
                         File file = new File(directory + "/" + requestedFile);
                         response = Server.readDataFromFile(file);
-                        body = body + "\t\"data\": \"" + response + "\",\n";
-                        statusCode = 200;
+                        if(disposition_type.equals("attachment")){
+                            System.out.println("creating an attachment....");
+                            File file2 = new File(directory + "/attach/" + requestedFile); //ye nai ho raha kya?
+                            Server.writeResponseToFile(file2, response);
+                            body= body + "\nPlease download the attachment here:" + file2.getAbsolutePath();
+                        }
+                        else {
+                            body = body + "\t\"data\": \"" + response + "\",\n";
+                            statusCode = 200;
+                        }
                     }
 
-                    if(disposition_type.equals("attachment")){
-                        System.out.println("creating an attachment....");
-                        File file = new File(directory + "/attach/" + requestedFile); //ye nai ho raha kya?
-                        Server.writeResponseToFile(file, body);
-                        body= body + "\nPlease download the attachment here:" + file.getAbsolutePath();
-                    }
+
                 }
                 else if(requestType.equalsIgnoreCase("POST"))
                 {
