@@ -26,11 +26,16 @@ httpfs GET / http://localhost:8080/get/
 
 httpfs GET /GetTest.txt http://localhost:8080/get/
 
+httpfs GET /img.png http://localhost:8080/get/
+
+httpfs GET /artemis.html http://localhost:8080/get/
+
+httpfs GET /getTest.txt http://localhost:8080/get/
+
 httpfs POST /PostTest.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"}
 
 httpfs POST /PostTest.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"} overwrite=false
 
-httpfs POST /Users/ashwinraghunath/Documents/Fall_2022/COMP_6461_CN/Assignments/PostTest2.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"}
 
 To test the httpc commands:-
 
