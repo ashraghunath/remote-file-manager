@@ -58,7 +58,7 @@ public class POST {
 
   private void getResponsePOST(String url) throws IOException {
     StringBuilder request = new StringBuilder();
-    socket = new Socket(server, 80);
+    socket = new Socket(server, 8080);
     PrintStream out = new PrintStream(socket.getOutputStream());
     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
     String r =
@@ -119,13 +119,6 @@ public class POST {
             break;
           }
         }
-//        else{
-//          if (writeToFile) {
-//            output.append(line + Constants.NEWLINE);
-//          } else {
-//            System.out.println(line);
-//          }
-//        }
       }
     }
 

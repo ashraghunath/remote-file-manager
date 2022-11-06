@@ -1,31 +1,21 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-
-
 public class Server {
-
     private static ServerSocket serverSocket;
     private static PrintWriter out = null;
     private static BufferedReader in = null;
     private static int port = 8080;
     private static int statusCode = 200;
-
-
     static boolean debugFlag = false;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-
         String request;
         List<String> requestList = new ArrayList<>();
-
         String directory = System.getProperty("user.dir");
-
         System.out.println("\nCurrent Directory is: " + directory + "\n");
-
         System.out.print("Enter the command to run the server >>");
         Scanner scan = new Scanner(System.in);
-
         request = scan.nextLine();
         if (request.isEmpty()) {
             System.out.println("Invalid Command Please try again!!");
@@ -69,13 +59,8 @@ public class Server {
             {
                 System.out.println(e.getMessage());
             }
-
-
             request = in.readLine();
-
             String clientRequestType = request.substring(0,7);
-
-
             if(clientRequestType.contains("httpc"))
             {
 
@@ -95,13 +80,8 @@ public class Server {
                 {
                     url = url.split(" ")[0];
                 }
-
                 URI uri = new URI(url);
-
                 String host = uri.getHost();
-
-
-
                 if (request.contains("get"))
                 {
                     options = request.substring(request.indexOf("get") + 4);
@@ -162,19 +142,12 @@ public class Server {
                     body = body + "\t},\n";
                 }
 
-
-
-
-
                 else if(request.contains("post"))
                 {
 
                     boolean jsonFlag = false;
                     String inlineData = "";
-
                     body = body + "\t\"args\": {},\n";
-
-
 
                     //Appending the data to the body
                     body = body + "\t\"data\": \"";
@@ -257,16 +230,11 @@ public class Server {
                     response = response + body;
                 }
 
-
-
-
                 if(debugFlag)
                     System.out.println(response);
                 out.write(response);
                 out.flush();
-
                 socket.close();
-
 
         }
 
@@ -304,8 +272,6 @@ public class Server {
 
                 String requestType = requestData.get(1);
 
-
-
                 if(requestType.equalsIgnoreCase("GET") && requestData.get(2).equals("/"))
                 {
 
@@ -328,40 +294,23 @@ public class Server {
                 {
                     String response = "";
                     String requestedFile = requestData.get(2).substring(1);
-
-
-
                     List<String> files = getFilesFromDirectory(currentFolder);
 
-
-
                     if (!files.contains(requestedFile)) {
-
                         statusCode = 404;
-
                     }
                     else {
-
                         File file = new File(directory + "/" + requestedFile);
-
                         response = Server.readDataFromFile(file);
-
                         body = body + "\t\"data\": \"" + response + "\",\n";
-
-
                         statusCode = 200;
                     }
-
-
                 }
-
                 else if(requestType.equalsIgnoreCase("POST"))
                 {
                     String response = "";
                     String requestedFile = requestData.get(2).substring(1);
                     String data = "";
-
-
                     List<String> files = getFilesFromDirectory(currentFolder);
 
                     boolean flagOverwrite = true;
@@ -379,10 +328,8 @@ public class Server {
                         data = data + requestData.get(i) + " ";
                     }
 
-
                     File file = new File(directory + "/" + requestedFile);
                     Server.writeResponseToFile(file, data);
-
 
                 }
 
@@ -412,14 +359,11 @@ public class Server {
                     System.out.println(body);
                 out.write(body);
                 out.flush();
-
-
             }
 
         }
 
     }
-
 
     static public void writeResponseToFile(File filename, String data)
     {
@@ -464,8 +408,6 @@ public class Server {
 
         return lines.toString();
     }
-
-
 
     /**
      * This method will give list of files from specific directory

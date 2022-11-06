@@ -1,10 +1,8 @@
 package HttpLibrary;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -28,6 +26,7 @@ public class GET {
     private List<String> data;
     private String headerInfoKeyValue = "";
     private Socket socket;
+    private String input;
 
     /**
      * Get request default constructor
@@ -39,10 +38,11 @@ public class GET {
 
     /**
      * Function to execute as soon as the get request arrives from the client
-     * @param input String input from the user
+     * @param input_cu String input from the user
      * @throws IOException
      */
-    public void run(String input) throws IOException {
+    public void run(String input_cu) throws IOException {
+        input = input_cu;
         data = Arrays.asList(input.split(" "));
 
         //get cannot contain -d or -f
@@ -52,6 +52,7 @@ public class GET {
         }
 
         parseInput(data);
+        System.out.println("url:" + url);
 
         getResponse(url);
 
@@ -64,60 +65,50 @@ public class GET {
      */
 
     public void getResponse(String url) throws IOException {
-        socket = new Socket(server, 80);
-        PrintStream out = new PrintStream(socket.getOutputStream()); // for sending the data to the stream , we can easily write
+
+        socket = new Socket(server, uri.getPort());
+        PrintWriter out = new PrintWriter(socket.getOutputStream()); // for sending the data to the stream , we can easily write
         // text with methods like println().
+        System.out.println("sending request to the server....");
+        out.write(input + "\n");
+        out.flush();
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        StringBuilder request = new StringBuilder();
-        String r = "GET " + url + " HTTP/1.0";
-        request.append(r);
-        request.append(Constants.NEWLINE);
-        request.append(headerInfoKeyValue);
-        out.println(request);
-        out.println();
-        String line = in.readLine();
-        String status = line;
+        StringBuilder response = new StringBuilder();
+        socket.setSoTimeout(1000);
+        String line;
+
+        try
+        {
+            while ((line = in.readLine()) != null) {
+                response.append(line + "\n");
+            }
+        }
+        catch (SocketTimeoutException s)
+        {
+            socket.close();
+        }
+
+
+//        if (status.split(" ")[1].startsWith("3")) {
+//            System.out.println(status);
+//            printRedirect(in);
+//        }
         StringBuilder output = new StringBuilder();
 
-        if (status.split(" ")[1].startsWith("3")) {
-            System.out.println(status);
-            printRedirect(in);
-        }
-        else if (isVerbose) {
 
-            while (line != null) {
 
-                if (writeToFile && line != null)
-                    output.append(line + Constants.NEWLINE);
-                else if (line != null)
-                    System.out.println(line);
-                if (line.equals("}")) {
-                    break;
-                }
-                line = in.readLine();
-            }
-        } else {
-            boolean isBody = false;
-            while ((line = in.readLine()) != null) {
-                if (line.trim().equals("")) {
-                    isBody = true;
-                }
-                if (isBody) {
-                    if (writeToFile) {
-                        output.append(line + Constants.NEWLINE);
-                    } else {
-                        System.out.println(line);
-                    }
-                }
-            }
-        }
-        if (writeToFile) {
+
+        if (writeToFile && response != null) {
+            output.append(response + Constants.NEWLINE);
             FileUtility.writeOutputToFile(output,fileName);
         }
+        else{
+            System.out.println("Response from server: \n"+ response);
+        }
 
-        in.close();
         out.close();
-        socket.close();
+        in.close();
+
     }
 
     /**
