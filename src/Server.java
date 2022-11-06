@@ -354,15 +354,8 @@ public class Server {
                         response = Server.readDataFromFile(file);
                         if(disposition_type.equals("attachment")){
                             System.out.println("creating an attachment....");
-                            if (!Files.exists(Paths.get(directory + "/attach/"))) {
-                               File attach = new File(directory + "/attach");
-                               attach.mkdirs();
-                            }
-
-                            File file2 = new File(directory + "/attach/" + requestedFile); //ye nai ho raha kya?
-                            Server.writeResponseToFile(file2, response);
-                            body = body + "\t\"location\": \"" + file2.getAbsolutePath() + "\",\n";
-
+                            System.out.println("directory + \"/attach\"");
+                            body= body + "\t\"location\" : " + file.getAbsolutePath()+"\n";
                         }
                         else {
                             body = body + "\t\"data\": \"" + response + "\",\n";
