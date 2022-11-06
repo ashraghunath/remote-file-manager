@@ -2,9 +2,9 @@ package HttpLibrary;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,9 +25,10 @@ public class POST {
   private Socket socket;
   private String contentData = "";
   private int contentLength;
+  private String input;
 
   /**
-   * Construtor for the post
+   * Constructor for the post
    */
   public POST() {
     isVerbose = false;
@@ -36,11 +37,12 @@ public class POST {
 
   /**
    * Function to run the post command as soon as it receives the string input from the terminal
-   * @param input String input (request) from the user
+   * @param input_c String input (request) from the user
    * @throws IOException
    */
 
-  public void run( String input) throws IOException {
+  public void run( String input_c) throws IOException {
+    input = input_c;
     data = Arrays.asList(input.split(" "));
     if (data.contains("-f") && (data.contains("-d") || data.contains("--d"))) {
       System.out.println("Arguments invalid please enter valid arguments");
@@ -57,101 +59,61 @@ public class POST {
    */
 
   private void getResponsePOST(String url) throws IOException {
-    StringBuilder request = new StringBuilder();
-    socket = new Socket(server, 8080);
-    PrintStream out = new PrintStream(socket.getOutputStream());
+    StringBuilder response = new StringBuilder();
+    socket = new Socket(server, uri.getPort());
+    PrintWriter out = new PrintWriter(socket.getOutputStream());
+    out.write(input + "\n");
+    out.flush();
+    String line;
     BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    String r =
-        "POST " + url + " HTTP/1.0" + Constants.NEWLINE + "Host: " + server + Constants.NEWLINE;
-    request.append(r);
-    request.append("Content-Length: " + contentLength);
-    request.append(Constants.NEWLINE);
-    if (data.contains("-h")) {
-      List<String> headerInfoList = new ArrayList<>();
-      for (int i = 0; i < data.size(); i++) {
-        if (data.get(i).equals("-h")) {
-          headerInfoList.add(data.get(i + 1));
-        }
-      }
-      if (!headerInfoList.isEmpty()) {
-        for (String headerInfo : headerInfoList) {
-          headerInfoKeyValue =
-              headerInfo.split(":")[0] + ":" + headerInfo.split(":")[1] + Constants.NEWLINE;
-          request.append(headerInfoKeyValue);
-        }
+    socket.setSoTimeout(1000);
+    try
+    {
+      while ((line = in.readLine()) != null) {
+        response.append(line + "\n");
       }
     }
-    request.append(Constants.NEWLINE);
-    request.append(contentData);
-    out.print(request);
-    String status = in.readLine();
-    String line = "";
+    catch (SocketTimeoutException s)
+    {
+      socket.close();
+    }
     // String line = in.readLine();
-    if (status.split(" ")[1].startsWith("3")) {
-      printRedirectPOST(in);
-    }
-    StringBuilder output = new StringBuilder();
-    if (isVerbose) {
-      System.out.println(status);
-      while ((line = in.readLine()) != null) {
-        if (writeToFile) {
-          output.append(line + Constants.NEWLINE);
-        } else {
-          System.out.println(line);
-        }
-        if (line.equals("}")) {
-          break;
-        }
-      }
-    } else {
-      boolean isJson = false;
-      while ((line = in.readLine()) != null) {
-        if (line.trim().equals("{")) {
-          isJson = true;
-        }
-        if (isJson) {
-          if (writeToFile) {
-            output.append(line + Constants.NEWLINE);
-          } else {
-            System.out.println(line);
-          }
-          if (line.equals("}")) {
-            break;
-          }
-        }
-      }
-    }
+//    if (status.split(" ")[1].startsWith("3")) {
+//      printRedirectPOST(in);
+//    }
 
-    if (writeToFile) {
-      FileUtility.writeOutputToFile(output,fileName);
-    }
+        if (writeToFile) {
+          FileUtility.writeOutputToFile(response,fileName);
+        } else {
+          System.out.println("Response from server:\n" + response);
+        }
+
     in.close();
     out.close();
-    socket.close();
   }
 
-  /**
-   * Get the redirect location for the POST query.
-   * @param in Input stream reader that contains the redirect url information
-   * @throws IOException
-   */
-  private void printRedirectPOST(BufferedReader in) throws IOException {
-    String location = null;
-    String line = in.readLine();
-    while (line != null) {
-      if (line != null) {
-        System.out.println(line);
-        if (line.contains("Location")) {
-          location = line.substring(line.indexOf(" ") + 1);
-          System.out.println("new location: " + location);
-        }
-      }
-      line = in.readLine();
-    }
-    System.out.println("------Redirecting-------");
-    socket.close();
-    getResponsePOST(location);
-  }
+//  /**
+//   * Get the redirect location for the POST query.
+//   * @param in Input stream reader that contains the redirect url information
+//   * @throws IOException
+//   */
+//  private void printRedirectPOST(BufferedReader in) throws IOException {
+//    String location = null;
+//    String line = in.readLine();
+//    while (line != null) {
+//      if (line != null) {
+//        System.out.println(line);
+//        if (line.contains("Location")) {
+//          location = line.substring(line.indexOf(" ") + 1);
+//          System.out.println("new location: " + location);
+//        }
+//      }
+//      line = in.readLine();
+//    }
+//    System.out.println("------Redirecting-------");
+//    socket.close();
+//    getResponsePOST(location);
+//  }
 
   /**
    * Make the POST request from the String input received from the user
