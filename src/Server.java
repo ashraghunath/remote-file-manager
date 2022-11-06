@@ -264,6 +264,7 @@ public class Server {
 
                 String host = uri.getHost();
 
+
                 String body = "{\n";
                 body = body + "\t\"args\":";
                 body = body + "{},\n";
@@ -272,18 +273,25 @@ public class Server {
 
                 body = body + "\n\t\t\"Connection\": \"close\",\n";
                 body = body + "\t\t\"Host\": \"" + host + "\"\n";
-                body = body + "\t},\n";
+
 
                 String requestType = requestData.get(1);
+                String content_type = "";
+                String disposition_type= "";
 
                 if(requestType.equalsIgnoreCase("GET") && requestData.get(2).equals("/"))
                 {
 
+                    content_type = "application/json"; //iska kuch karna hai?
+                    disposition_type = "inline";
                     body = body + "\t\"files\": { ";
                     List<String> files = getFilesFromDirectory(currentFolder);
 
-                    List<String> fileFilterList = new ArrayList<String>();
+                    List<String> fileFilterList = new ArrayList<>();
                     fileFilterList.addAll(files);
+                    body = body + "\t\t\"Content-Type\": \"" + content_type + "\"\n";
+                    body = body + "\t\t\"Content-disposition\": \"" + disposition_type + "\"\n";
+                    body = body + "\t},\n";
 
                     for (int i = 0; i < fileFilterList.size() - 1; i++) {
                         body = body + files.get(i) + " , ";
@@ -299,9 +307,42 @@ public class Server {
 
                 else if(requestType.equalsIgnoreCase("GET") && !requestData.get(2).equals("/"))
                 {
+
+
                     String response = "";
                     String requestedFile = requestData.get(2).substring(1);
+                    System.out.println("requested file" + requestedFile);
+                    String type = requestedFile.split("\\.")[1];
+                    System.out.println("type"+ type);
+                    if (type.matches("jpeg|png|gif|tiff|svg+xml")){
+                        content_type = "image/"+ type;
+                        disposition_type = "attachment";
+                    }
+                    else if (type.matches("css|csv|html|plain|xml|txt")){
+                        content_type = "text/"+ type;
+                        disposition_type = "inline";
+                    }
+                    else if (type.matches("pdf|json|zip|ogg|EDIFACT|octet-stream")){
+                        content_type = "application/"+ type;
+                        disposition_type = "attachment";
+                    }
+                    else if (type.matches("mpeg|x-wav|mp3")){
+                        content_type = "audio/"+ type;
+                        disposition_type = "attachment";
+                    }
+                    else if (type.matches("mpeg|x-wav|mp3")){
+                        content_type = "audio/"+ type;
+                        disposition_type = "attachment";
+                    }
+                    else if (type.matches("mpeg|quicktime|mp4|webm")){
+                        content_type = "video/"+ type;
+                        disposition_type = "attachment";
+                    }
+
                     List<String> files = getFilesFromDirectory(currentFolder);
+                    body = body + "\t\t\"Content-Type\": \"" + content_type + "\"\n";
+                    body = body + "\t\t\"Content-disposition\": \"" + disposition_type + "\"\n";
+                    body = body + "\t},\n";
 
                     if (!files.contains(requestedFile)) {
                         statusCode = 404;
@@ -311,6 +352,13 @@ public class Server {
                         response = Server.readDataFromFile(file);
                         body = body + "\t\"data\": \"" + response + "\",\n";
                         statusCode = 200;
+                    }
+
+                    if(disposition_type.equals("attachment")){
+                        System.out.println("creating an attachment....");
+                        File file = new File(directory + "/attach/" + requestedFile); //ye nai ho raha kya?
+                        Server.writeResponseToFile(file, body);
+                        body= body + "\nPlease download the attachment here:" + file.getAbsolutePath();
                     }
                 }
                 else if(requestType.equalsIgnoreCase("POST"))
@@ -348,32 +396,46 @@ public class Server {
                     }
 
                 }
-
+                String responseMessage = "";
                 if(statusCode == 200)
                 {
-                    body = body + "\t\"status\": \"" + "HTTP/1.1 200 OK" + "\",\n";
+                    responseMessage = "HTTP/1.1 200 OK";
+
                 }
                 else if(statusCode == 201)
                 {
-                    body = body + "\t\"status\": \"" + "HTTP/1.1 201 FILE OVER-WRITTEN" + "\",\n";
+                    responseMessage = "HTTP/1.1 201 FILE OVER-WRITTEN";
                 }
                 else if(statusCode == 202)
                 {
-                    body = body + "\t\"status\": \"" + "HTTP/1.1 202 NEW FILE CREATED" + "\",\n";
+                    responseMessage = "HTTP/1.1 202 NEW FILE CREATED";
                 }
                 else if(statusCode == 301)
                 {
-                    body = body + "\t\"status\": \"" + "HTTP/1.1 301 NOT MODIFIED" + "\",\n";
+                    responseMessage = "HTTP/1.1 301 NOT MODIFIED";
                 }
                 else if(statusCode == 404)
                 {
-                    body = body + "\t\"status\": \"" + "HTTP/1.1 404 FILE NOT FOUND" + "\",\n";
+                    responseMessage = "HTTP/1.1 404 FILE NOT FOUND";
                 }
+                body = body + "\t\"status\": \"" + responseMessage + "\",\n";
 
 
                 body = body + "\t\"origin\": \"" + InetAddress.getLocalHost().getHostAddress() + "\",\n";
                 body = body + "\t\"url\": \"" + url + "\"\n";
                 body = body + "}\n";
+
+                String header = "";
+                header = header + responseMessage;
+                header = header + "Date: " + Calendar.getInstance().getTime() + "\n";
+                header = header + "Content-Type: application/json\n";
+                header = header + "Content-Length: "+ body.length() +"\n";
+                header = header + "Connection: close\n";
+                header = header + "Server: Localhost\n";
+                header = header + "Access-Control-Allow-Origin: *\n";
+                header = header + "Access-Control-Allow-Credentials: true\n";
+
+                body = header + body;
 
                 if(debugFlag)
                     System.out.println(body);
