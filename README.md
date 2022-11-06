@@ -11,6 +11,17 @@ the content of the body of the request.
 
 To test the file transfer command:-
 
+To run the server:-
+httpfs -v -p 8080
+
+httpfs -p 8080
+
+httpfs -v -p 8080 -d TestDirectory1
+
+httpfs -v -p 8080 -d D:\MACS\TestDirectory2
+
+To test the file transfer command:-
+
 httpfs GET / http://localhost:8080/get/
 
 httpfs GET /GetTest.txt http://localhost:8080/get/
@@ -19,6 +30,7 @@ httpfs POST /PostTest.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6
 
 httpfs POST /PostTest.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"} overwrite=false
 
+httpfs POST /Users/ashwinraghunath/Documents/Fall_2022/COMP_6461_CN/Assignments/PostTest2.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"}
 
 To test the httpc commands:-
 

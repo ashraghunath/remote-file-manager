@@ -13,7 +13,6 @@ public class Server {
         String request;
         List<String> requestList = new ArrayList<>();
         String directory = System.getProperty("user.dir");
-        System.out.println("\nCurrent Directory is: " + directory + "\n");
         System.out.print("Enter the command to run the server >>");
         Scanner scan = new Scanner(System.in);
         request = scan.nextLine();
@@ -43,7 +42,12 @@ public class Server {
         if (debugFlag)
             System.out.println("Server is up and is assigned port number : " + port);
 
+
         File currentFolder = new File(directory);
+
+        currentFolder.mkdirs();
+
+        System.out.println("\nCurrent Directory is: " + directory + "\n");
 
         while(true)
         {
@@ -285,7 +289,10 @@ public class Server {
                         body = body + files.get(i) + " , ";
                     }
 
-                    body = body + fileFilterList.get(fileFilterList.size() - 1) + " },\n";
+                    if(fileFilterList.size()==0)
+                        body = body + " },\n";
+                    if(fileFilterList.size()!=0)
+                        body = body + fileFilterList.get(fileFilterList.size() - 1) + " },\n";
                     statusCode = 200;
 
                 }
