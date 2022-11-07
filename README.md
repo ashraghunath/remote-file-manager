@@ -2,42 +2,37 @@
 
 ## HTTP Remote File fileManagerServer Implementation
 
-* 1- GET / returns a list of the current files in the data directory. 
-
-* 2- GET /foo returns the content of the file named foo in the data directory. If the content
-does not exist, it should return an appropriate status code (e.g. HTTP ERROR 404).
-* 3- POST /bar should create or overwrite the file named bar in the data directory with
-the content of the body of the request. 
-
-To test the file transfer command:-
-
-To run the server:-
+Server command examples: 
 httpfs -v -p 8080
 
 httpfs -p 8080
 
 httpfs -v -p 8080 -d TestDirectory1
 
-httpfs -v -p 8080 -d D:\MACS\TestDirectory2
 
-To test the file transfer command:-
+
+File commands examples:
 
 httpfs GET / http://localhost:8080/get/
 
-httpfs GET /GetTest.txt http://localhost:8080/get/
+httpfs GET /sampleText.txt http://localhost:8080/get/
 
 httpfs GET /img.png http://localhost:8080/get/
 
 httpfs GET /artemis.html http://localhost:8080/get/
 
-httpfs GET /img.png http://localhost:8080/get/
+httpfs POST /samplePost.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"}
 
-httpfs POST /PostTest.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"}
-
-httpfs POST /PostTest.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6461"} overwrite=false
+httpfs POST /samplePost.txt http://localhost:8080/post/ -d {Assignment 2 : "Comp 6477"} overwrite=false
 
 
-To test the httpc commands:-
+
+
+
+
+
+
+httpc commands examples:
 
 httpc get -h Content-Type:application/json -h Testing-Header:TestHeader 'http://localhost:8080/get?course=networking&assignment=1'
 

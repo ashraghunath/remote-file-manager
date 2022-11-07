@@ -23,23 +23,22 @@ public class fileManagerClient {
 
             String ftp_request = "";
             String server_response = "";
-            System.out.print("Please Enter File transfer command : ");
+            System.out.print("Please enter your command : ");
             Scanner sc = new Scanner(System.in);
             ftp_request = sc.nextLine();
             String url = "";
 
 
             if (ftp_request.length() == 0 ||  ftp_request.isEmpty() ) {
-                System.out.println("Invalid Command, please enter a valid command");
+                System.out.println("Invalid Command detected, please try again");
                 continue;
             }
 
             if((ftp_request.contains("post") && !ftp_request.contains("-d")))
             {
-                System.out.println("Please enter POST url with inline data");
+                System.out.println("POST url should be with inline data");
                 continue;
             }
-
 
             List<String> ftp_requestlist;
             ftp_requestlist = Arrays.asList(ftp_request.split(" "));
@@ -64,7 +63,7 @@ public class fileManagerClient {
             String line;
 
             //Send Request
-            System.out.println("Sending ftp_request to Server");
+            System.out.println("Sending file transfer request to Server");
             out.write(ftp_request + "\n");
             out.flush();
 
@@ -88,7 +87,7 @@ public class fileManagerClient {
 
             server_response = sb.toString();
 
-            System.out.println("\nResponse from Server : \n " + server_response);
+            System.out.println("\nServer response : \n " + server_response);
 
 
         }

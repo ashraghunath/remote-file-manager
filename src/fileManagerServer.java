@@ -14,11 +14,11 @@ public class fileManagerServer {
         String request;
         List<String> requestList = new ArrayList<>();
         String directory = System.getProperty("user.dir");
-        System.out.print("Enter the command to run the server >>");
+        System.out.print("You can now start the server :\n");
         Scanner scan = new Scanner(System.in);
         request = scan.nextLine();
         if (request.isEmpty()) {
-            System.out.println("Invalid Command Please try again!!");
+            System.out.println("Command unknown");
         }
         String[] requestArray = request.split(" ");
 
@@ -35,26 +35,25 @@ public class fileManagerServer {
 
         if (requestList.contains("-d")) {
             directory = requestList.get(requestList.indexOf("-d") + 1).trim();
-            System.out.println("Directory for performing operations : " + directory + "\n");
+            System.out.println("Working directory requested : " + directory + "\n");
         }
 
-        //isDebug = true;
         serverSocket = new ServerSocket(port);
         if (isDebug)
-            System.out.println("Server is up and is assigned port number : " + port);
+            System.out.println("Server started on port : " + port);
 
 
         File currentFolder = new File(directory);
 
         currentFolder.mkdirs();
 
-        System.out.println("\nCurrent Directory is: " + directory + "\n");
+        System.out.println("\nWorking Directory : " + directory + "\n");
 
         while(true)
         {
             Socket socket = serverSocket.accept();
             if (isDebug)
-                System.out.println("Connection establishment successful between server and client");
+                System.out.println("Server and Client successfully connected");
 
             try {
                 out = new PrintWriter(socket.getOutputStream());
@@ -69,7 +68,8 @@ public class fileManagerServer {
             if(clientRequestType.contains("httpc"))
             {
 
-                System.out.println("Performing HTTPC operations\n\n");
+                if(isDebug)
+                    System.out.println("detected HTTPC command\n\n");
 
                 String url = "";
                 String response = "";
@@ -246,8 +246,8 @@ public class fileManagerServer {
             else if(clientRequestType.contains("httpfs"))
             {
 
-
-                System.out.println("Performing httpfs operations");
+                if(isDebug)
+                    System.out.println("Detected httpfs command");
                 String url = "";
 
                 List<String> requestData = Arrays.asList(request.split(" "));
@@ -460,11 +460,11 @@ public class fileManagerServer {
             bufferedWriter.close();
 
             if(isDebug)
-                System.out.println("Response from the server is successfully written to " + filename);
+                System.out.println("Server response written to : " + filename);
 
         } catch (IOException ex) {
             if(isDebug)
-                System.out.println("Error Writing file named '" + filename + "'" + ex);
+                System.out.println("Error Writing to file '" + filename + "'" + ex);
         }
     }
 
@@ -488,7 +488,7 @@ public class fileManagerServer {
         catch(IOException ex)
         {
             if(isDebug)
-                System.out.println("Error reading file named '" + filename + "'" + ex);
+                System.out.println("Error reading file '" + filename + "'" + ex);
         }
 
         return lines.toString();
