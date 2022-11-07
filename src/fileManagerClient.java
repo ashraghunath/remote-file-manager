@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Scanner;
 
 
-public class ftpc {
+public class fileManagerClient {
 
-    private static Socket client_socket = null;
-    private static List<String> headerList = null;
+    private static Socket clientSocket = null;
 
     private static PrintWriter out = null;
     private static BufferedReader in = null;
@@ -57,10 +56,10 @@ public class ftpc {
             URI uri = new URI(url);
 
             String hostName = uri.getHost();
-            client_socket = new Socket(hostName, uri.getPort());
+            clientSocket = new Socket(hostName, uri.getPort());
 
-            out = new PrintWriter(client_socket.getOutputStream());
-            in = new BufferedReader(new InputStreamReader(client_socket.getInputStream()));
+            out = new PrintWriter(clientSocket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             StringBuilder sb = new StringBuilder();
             String line;
 
@@ -69,7 +68,7 @@ public class ftpc {
             out.write(ftp_request + "\n");
             out.flush();
 
-            client_socket.setSoTimeout(1000);
+            clientSocket.setSoTimeout(1000);
 
 
             //Receive Response
@@ -81,7 +80,7 @@ public class ftpc {
                 }
 
             }catch(SocketTimeoutException s){
-                    client_socket.close();
+                    clientSocket.close();
             }
 
             out.close();

@@ -1,6 +1,6 @@
 # remote-file-manager
 
-## HTTP Remote File Server Implementation
+## HTTP Remote File fileManagerServer Implementation
 
 * 1- GET / returns a list of the current files in the data directory. 
 

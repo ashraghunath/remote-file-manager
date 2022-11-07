@@ -1,15 +1,14 @@
 import java.io.*;
 import java.net.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.*;
-public class Server {
+public class fileManagerServer {
+
     private static ServerSocket serverSocket;
     private static PrintWriter out = null;
     private static BufferedReader in = null;
     private static int port = 8080;
     private static int statusCode = 200;
-    static boolean debugFlag = false;
+    static boolean isDebug = false;
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         String request;
@@ -26,7 +25,7 @@ public class Server {
         requestList.addAll(Arrays.asList(requestArray));
 
         if (requestList.contains("-v")) {
-            debugFlag = true;
+            isDebug = true;
         }
 
         if (requestList.contains("-p")) {
@@ -39,9 +38,9 @@ public class Server {
             System.out.println("Directory for performing operations : " + directory + "\n");
         }
 
-        //debugFlag = true;
+        //isDebug = true;
         serverSocket = new ServerSocket(port);
-        if (debugFlag)
+        if (isDebug)
             System.out.println("Server is up and is assigned port number : " + port);
 
 
@@ -54,7 +53,7 @@ public class Server {
         while(true)
         {
             Socket socket = serverSocket.accept();
-            if (debugFlag)
+            if (isDebug)
                 System.out.println("Connection establishment successful between server and client");
 
             try {
@@ -236,7 +235,7 @@ public class Server {
                     response = response + body;
                 }
 
-                if(debugFlag)
+                if(isDebug)
                     System.out.println(response);
                 out.write(response);
                 out.flush();
@@ -286,14 +285,14 @@ public class Server {
 
                     content_type = "application/json"; //iska kuch karna hai?
                     disposition_type = "inline";
+                    body = body + "\t\t\"Content-Type\": \"" + content_type + "\"\n";
+                    body = body + "\t\t\"Content-disposition\": \"" + disposition_type + "\"\n";
+                    body = body + "\t},\n";
                     body = body + "\t\"files\": { ";
                     List<String> files = getFilesFromDirectory(currentFolder);
 
                     List<String> fileFilterList = new ArrayList<>();
                     fileFilterList.addAll(files);
-                    body = body + "\t\t\"Content-Type\": \"" + content_type + "\"\n";
-                    body = body + "\t\t\"Content-disposition\": \"" + disposition_type + "\"\n";
-                    body = body + "\t},\n";
 
                     for (int i = 0; i < fileFilterList.size() - 1; i++) {
                         body = body + files.get(i) + " , ";
@@ -351,7 +350,7 @@ public class Server {
                     }
                     else {
                         File file = new File(directory + "/" + requestedFile);
-                        response = Server.readDataFromFile(file);
+                        response = fileManagerServer.readDataFromFile(file);
                         if(disposition_type.equals("attachment")){
                             System.out.println("creating an attachment....");
                             System.out.println("directory + \"/attach\"");
@@ -396,7 +395,7 @@ public class Server {
                     }
 
                         File file = new File(directory + "/" + requestedFile);
-                        Server.writeResponseToFile(file, data);
+                        fileManagerServer.writeResponseToFile(file, data);
                     }
 
                 }
@@ -430,7 +429,7 @@ public class Server {
                 body = body + "}\n";
 
                 String header = "";
-                header = header + responseMessage;
+                header = header + responseMessage+"\n";
                 header = header + "Date: " + Calendar.getInstance().getTime() + "\n";
                 header = header + "Content-Type: application/json\n";
                 header = header + "Content-Length: "+ body.length() +"\n";
@@ -441,7 +440,7 @@ public class Server {
 
                 body = header + body;
 
-                if(debugFlag)
+                if(isDebug)
                     System.out.println(body);
                 out.write(body);
                 out.flush();
@@ -460,11 +459,11 @@ public class Server {
             bufferedWriter.write(data);
             bufferedWriter.close();
 
-            if(debugFlag)
+            if(isDebug)
                 System.out.println("Response from the server is successfully written to " + filename);
 
         } catch (IOException ex) {
-            if(debugFlag)
+            if(isDebug)
                 System.out.println("Error Writing file named '" + filename + "'" + ex);
         }
     }
@@ -488,7 +487,7 @@ public class Server {
         }
         catch(IOException ex)
         {
-            if(debugFlag)
+            if(isDebug)
                 System.out.println("Error reading file named '" + filename + "'" + ex);
         }
 
