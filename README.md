@@ -46,7 +46,7 @@ httpc get -v -h Content-Type:application/json 'http://localhost:8080/get?course=
 
 httpc post -v -h Content-Type:application/json -d '{"Assignment": 2, "Course": 6461}' 'http://localhost:8080/post?'
 
-
+httpc get -v 'http://localhost:8080/get?course=networking&assignment=1' -o hello.txt
 
 
 
