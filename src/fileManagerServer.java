@@ -355,6 +355,7 @@ public class fileManagerServer {
                             System.out.println("creating an attachment....");
                             System.out.println("directory + \"/attach\"");
                             body= body + "\t\"location\" : " + file.getAbsolutePath()+"\n";
+                            statusCode = 200;
                         }
                         else {
                             body = body + "\t\"data\": \"" + response + "\",\n";

@@ -7,7 +7,7 @@ httpfs -v -p 8080
 
 httpfs -p 8080
 
-httpfs -v -p 8080 -d TestDirectory
+httpfs -v -p 8080 -d Dir
 
 
 
