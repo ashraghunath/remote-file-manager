@@ -384,7 +384,7 @@ public class fileManagerServer {
                         statusCode = 301;
 
 
-                    if(flagOverwrite) {
+
                     int index = requestData.indexOf("-d");
 
                     for(int i = index + 1 ; i < requestData.size() ; i++)
@@ -395,8 +395,8 @@ public class fileManagerServer {
                     }
 
                         File file = new File(directory + "/" + requestedFile);
-                        fileManagerServer.writeResponseToFile(file, data);
-                    }
+                        fileManagerServer.writeResponseToFile(file, data,flagOverwrite);
+
 
                 }
                 String responseMessage = "";
@@ -450,11 +450,19 @@ public class fileManagerServer {
 
     }
 
-    static public void writeResponseToFile(File filename, String data)
+    static public void writeResponseToFile(File filename, String data, boolean flagOverwrite)
     {
-        try
-        {
-            BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filename));
+        System.out.println("Writing the data to the file....");
+        try {
+            BufferedWriter bufferedWriter;
+
+            if (flagOverwrite == true) {
+                System.out.println("Over writing is set to true");
+                bufferedWriter = new BufferedWriter(new FileWriter(filename));
+            } else {
+                System.out.println("Appending the data");
+                bufferedWriter = new BufferedWriter(new FileWriter(filename, true));
+            }
 
             bufferedWriter.write(data);
             bufferedWriter.close();
